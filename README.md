@@ -57,6 +57,8 @@ listed below.  Everything else will be left as a string:
  * ``true`` / ``false``
  * ``null``
  * ``unset`` will delete the key
+ * ``append:value`` will append a 'value' to an array if the value does not exist already
+ * ``extend:value1, value2`` will append 'value1' and 'value2' to an array (if the values do not exist already)
 
 
 Examples
@@ -64,7 +66,7 @@ Examples
 
 For the example JSON document ``/foo/bar.json`` containing:
 ````
-{ "a": 5, "b": {"c": 6, "d": "hello" } }
+{ "a": 5, "b": {"c": 6, "d": "hello" }, "values": ["one", "two"] }
 ````
 
 ...you can run an invocation like:
@@ -74,6 +76,7 @@ For the example JSON document ``/foo/bar.json`` containing:
      a=7
      b.c=yellow
      b.d=unset
+     values=extend:two, three
 ````
 
 ...and the file will be left looking like:
@@ -84,5 +87,10 @@ For the example JSON document ``/foo/bar.json`` containing:
   "b": {
     "c": "yellow"
   }
+  "values": [
+    "one",
+    "two",
+    "three"
+  ]
 }
 ````
