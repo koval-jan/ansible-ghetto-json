@@ -42,7 +42,7 @@ def main(params_list):
                     target = False
                 if target == 'true':
                     target = True
-                if last_part not in ref or ref[last_part] != target:                    
+                if last_part not in ref or ref[last_part] != target:
                     ref[last_part] = target
                     changed = True
 
