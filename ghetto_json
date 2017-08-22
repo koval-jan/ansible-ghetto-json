@@ -3,6 +3,7 @@
 import json
 import sys
 import shlex
+import re
 
 try:
     import commentjson
@@ -35,7 +36,9 @@ def main(params_list):
     with open(path) as f:
         obj = json_load(f)
         for (key, target) in params.items():
-            parts = key.split('.')
+            parts = re.split(r'(?<!\\)\.', key)
+            parts = [part.replace('\.','.') for part in parts]
+
             ref = obj
             for part in parts[:-1]:
                 if part not in ref:
