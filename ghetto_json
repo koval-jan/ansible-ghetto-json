@@ -43,6 +43,12 @@ def main(params_list):
                     target = False
                 if target == 'true':
                     target = True
+                if '[' in target and ']' in target :
+                    arr = []
+                    target = target.replace('[','').replace(']','').split(',')
+                    for e in target:
+                        arr.append(e.replace('"','').lstrip())
+                    target = arr
                 if last_part not in ref or ref[last_part] != target:
                     ref[last_part] = target
                     changed = True

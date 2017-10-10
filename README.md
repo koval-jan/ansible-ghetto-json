@@ -57,7 +57,16 @@ listed below.  Everything else will be left as a string:
  * ``true`` / ``false``
  * ``null``
  * ``unset`` will delete the key
+ * ansible list support is still experimental but should work:
 
+ ``
+   - name: Modify keepalive handlers array in config.json using ghetto custom module
+     ghetto_json: path=/etc/sensu/config.json client.keepalive.handlers='{{managed_keepalive_handlers|to_json}}'
+     when: supervision is not defined or supervision == 'no'
+     ignore_errors: yes 
+     tags:
+     	- ghetto
+ ``
 
 Examples
 --------
