@@ -4,9 +4,11 @@ import json
 import sys
 import shlex
 import re
+import os
 
 try:
     import commentjson
+
     json_load = commentjson.load
 except ImportError:
     json_load = json.load
@@ -26,18 +28,18 @@ def type_coerce(target):
 
 def main(params_list):
     params = dict(x.split("=", 1) for x in params_list)
-    path = params.pop('path')
+    path = os.path.expanduser(params.pop('path'))
     changed = False
 
     for key in params.keys():
-      if key.startswith('_ansible_'):
-        params.pop(key)
+        if key.startswith('_ansible_'):
+            params.pop(key)
 
     with open(path) as f:
         obj = json_load(f)
         for (key, target) in params.items():
             parts = re.split(r'(?<!\\)\.', key)
-            parts = [part.replace('\.','.') for part in parts]
+            parts = [part.replace('\.', '.') for part in parts]
 
             ref = obj
             for part in parts[:-1]:
