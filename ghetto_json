@@ -3,12 +3,26 @@
 import json
 import sys
 import shlex
+import re
 
 try:
     import commentjson
     json_load = commentjson.load
 except ImportError:
     json_load = json.load
+
+
+def type_coerce(target):
+    if target.isdigit():
+        return int(target)
+    if target == 'null':
+        return None
+    if target == 'false':
+        return False
+    if target == 'true':
+        return True
+    return target
+
 
 def main(params_list):
     params = dict(x.split("=", 1) for x in params_list)
@@ -22,7 +36,9 @@ def main(params_list):
     with open(path) as f:
         obj = json_load(f)
         for (key, target) in params.items():
-            parts = key.split('.')
+            parts = re.split(r'(?<!\\)\.', key)
+            parts = [part.replace('\.','.') for part in parts]
+
             ref = obj
             for part in parts[:-1]:
                 if part not in ref:
@@ -34,15 +50,20 @@ def main(params_list):
                 if last_part in ref:
                     del ref[last_part]
                     changed = True
+            elif target.startswith('extend:'):
+                elms = target[target.find(':') + 1:]
+                new_list = [type_coerce(v.strip()) for v in elms.split(',')
+                            if type_coerce(v.strip()) not in ref[last_part]]
+                if new_list:
+                    ref[last_part].extend(new_list)
+                    changed = True
+            elif target.startswith('append:'):
+                val = type_coerce(target[target.find(':') + 1:])
+                if val not in ref[last_part]:
+                    ref[last_part].append(val)
+                    changed = True
             else:
-                if target.isdigit():
-                    target = int(target)
-                if target == 'null':
-                    target = None
-                if target == 'false':
-                    target = False
-                if target == 'true':
-                    target = True
+                target = type_coerce(target)
                 if last_part not in ref or ref[last_part] != target:
                     ref[last_part] = target
                     changed = True
@@ -59,4 +80,3 @@ if __name__ == '__main__':
         main(shlex.split(open(sys.argv[1]).read()))
     else:
         main(sys.argv[1:])
-
