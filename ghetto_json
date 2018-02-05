@@ -23,6 +23,12 @@ def type_coerce(target):
         return False
     if target == 'true':
         return True
+    if '[' in target and ']' in target:
+        arr = []
+        target = target.replace('[', '').replace(']', '').split(',')
+        for e in target:
+            arr.append(e.replace('"', '').lstrip())
+        target = arr
     return target
 
 
